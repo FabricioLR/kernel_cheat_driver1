@@ -1,0 +1,40 @@
+#pragma once
+#include <ntifs.h>
+#include <ntdef.h>
+
+#define IO_GET_CLIENTADDRESS CTL_CODE(FILE_DEVICE_UNKNOWN, 0x666, METHOD_BUFFERED, FILE_SPECIAL_ACCESS)
+#define IO_GET_PROCESSID CTL_CODE(FILE_DEVICE_UNKNOWN, 0x667, METHOD_BUFFERED, FILE_SPECIAL_ACCESS)
+#define IO_READ_REQUEST CTL_CODE(FILE_DEVICE_UNKNOWN, 0x668, METHOD_BUFFERED, FILE_SPECIAL_ACCESS)
+#define IO_WRITE_REQUEST CTL_CODE(FILE_DEVICE_UNKNOWN, 0x669, METHOD_BUFFERED, FILE_SPECIAL_ACCESS)
+
+NTSTATUS DriverEntry(PDRIVER_OBJECT pDriverObject, PUNICODE_STRING pRegistryPath);
+NTSTATUS UnloadDriver(PDRIVER_OBJECT pDriverObject);
+
+PLOAD_IMAGE_NOTIFY_ROUTINE ImageLoadCallback(PUNICODE_STRING FullImageName, HANDLE ProcessId, PIMAGE_INFO ImageINfo);
+
+NTSTATUS IoControl(PDEVICE_OBJECT DeviceObject, PIRP pIrp);
+NTSTATUS CreateCall(PDEVICE_OBJECT DeviceObject, PIRP pIrp);
+NTSTATUS CloseCall(PDEVICE_OBJECT DeviceObject, PIRP pIrp);
+
+NTSTATUS NTAPI MmCopyVirtualMemory(PEPROCESS SourceProcess, PVOID SourceAddress, PEPROCESS TargetProcess, PVOID TargetAddress, SIZE_T BufferSize, KPROCESSOR_MODE PreviousMode, PSIZE_T ReturnSize);
+NTSTATUS KernelReadVirtualMemory(PEPROCESS SourceProcess, PVOID SourceAddress, PVOID TargetAddress, SIZE_T Size);
+NTSTATUS KernelWriteVirtualMemory(PEPROCESS Process, PVOID SourceAddress, PVOID TargetAddress, SIZE_T Size);
+
+ULONG AssaultCubeAcClientAddress;
+ULONG AssaultCubeAcProcessId;
+PDEVICE_OBJECT pDeviceObject;
+UNICODE_STRING dev, dos;
+
+typedef struct _KERNEL_READ_REQUEST {
+    ULONG ProcessId;
+    ULONG Address;
+    PVOID pBuff;
+    ULONG Size;
+} KERNEL_READ_REQUEST, * PKERNEL_READ_REQUEST;
+
+typedef struct _KERNEL_WRITE_REQUEST {
+    ULONG ProcessId;
+    ULONG Address;
+    PVOID pBuff;
+    ULONG Size;
+} KERNEL_WRITE_REQUEST, * PKERNEL_WRITE_REQUEST;
